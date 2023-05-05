@@ -1,0 +1,24 @@
+.product-card:nth-child(4n) {
+    border-right: 1px solid transparent !important;
+}
+
+.categories-tree .accordion-button {
+    padding: 0;
+    width: fit-content;
+    margin-left: auto;
+}
+
+.categories-tree .category-link {
+    color: var(--bs-dark);
+    text-decoration: none;
+}
+
+.categories-tree .accordion-button:not(.collapsed) {
+    background-color: unset;
+    box-shadow: unset;
+    color: var(--bs-warning);
+}
+
+.categories-tree .active {
+    color: var(--bs-warning);
+}

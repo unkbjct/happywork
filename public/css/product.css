@@ -1,0 +1,18 @@
+.review-star { 
+    font-size: 25px;
+    transition: .15s;
+}
+
+.review-star:hover { 
+    cursor: pointer;
+    color: var(--bs-warning) !important;
+}
+
+.review-star.checked {
+    color: var(--bs-warning) !important;
+}
+
+.review-star:active {
+    color: var(--bs-warning) !important;
+    rotate: 30deg;
+}
