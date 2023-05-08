@@ -291,6 +291,7 @@ header {
     color: white;
     /* transition: all ease .25s; */
     cursor: pointer;
+    z-index: 20;
 }
 
 .alert-success {
@@ -327,6 +328,45 @@ header {
     /* Обрезаем все, что не помещается в область */
     text-overflow: ellipsis;
     /* Добавляем многоточие */
+}
+
+.btn-favorite {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    /* border: ; */
+    padding: 6px;
+    background-color: white;
+    transition: box-shadow .25s;
+}
+
+.product-page.btn-favorite {
+    position: unset;
+    display: inline-block;
+}
+
+.btn-favorite:hover {
+    box-shadow: 0 0 10px rgba(30, 30, 30, .12);
+}
+
+.btn-favorite.active .not-fill {
+    display: none;
+}
+
+.btn-favorite.active .fill {
+    color: var(--bs-warning);
+    padding: 0 2px;
+}
+
+.btn-favorite:not(.active) .fill {
+    display: none;
+}
+
+.count-product::-webkit-outer-spin-button,
+.count-product::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 @media screen and (max-width: 1400px) {
@@ -403,5 +443,9 @@ header {
 
     #catalog-btn-mobile {
         display: block;
+    }
+    .cart-edit-border {
+        border: unset !important;
+        border-bottom: 1px solid var(--bs-border-color) !important;
     }
 }

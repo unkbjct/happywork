@@ -17,7 +17,7 @@
             <form action="{{ route('admin.products.list') }}" method="get">
                 <div class="d-flex flex-wrap">
                     <div class="me-2">
-                        <input type="text" name="id" value="{{ old('value') }}" class="form-control"
+                        <input type="text" name="id" value="{{ old('id') }}" class="form-control"
                             placeholder="Идентификатор">
                     </div>
                     <div class="me-2">

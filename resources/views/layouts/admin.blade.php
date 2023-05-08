@@ -12,6 +12,7 @@
     <script src="{{ asset('public/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('public/js/jquery-3.6.4.min.js') }}"></script>
     <script src="{{ asset('public/js/main.js') }}"></script>
+    <script src="{{ asset('public/js/admin.js') }}"></script>
     @yield('scripts')
     <title>@yield('title')</title>
 </head>
@@ -57,18 +58,13 @@
         </header>
         <main id="main">
             <aside class="bg-dark border-top border-bottom border-warning border-opacity-50">
-                <div class="aside-content">
-                    <div class="aside-item border-bottom border-secondary ">
-                        <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
-                            <path
-                                d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5ZM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5 5 5Z" />
-                        </svg>
-                        <span>Главная</span>
+                <div class="aside-content d-flex flex-column">
+                    <div class="p-3 border-bottom">
+                        <h4 class="text-center">Happy Works</h4>
                     </div>
                     <a href="{{ route('admin.products.list') }}">
                         <div
-                            class="aside-item border-bottom border-secondary @if (Route::currentRouteName() == 'admin.products.list') active @endif">
+                            class="aside-item border-bottom border-secondary @if (str_contains(Route::currentRouteName(), 'products')) active @endif">
                             <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                 fill="currentColor" class="bi bi-box" viewBox="0 0 16 16">
                                 <path
@@ -79,7 +75,7 @@
                     </a>
                     <a href="{{ route('admin.categories.list') }}">
                         <div
-                            class="aside-item border-bottom border-secondary @if (Route::currentRouteName() == 'admin.categories.list') active @endif">
+                            class="aside-item border-bottom border-secondary @if (str_contains(Route::currentRouteName(), 'categories')) active @endif">
                             <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                 fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
                                 <path
@@ -90,29 +86,56 @@
                             <span>Категории</span>
                         </div>
                     </a>
-                    <div class="aside-item border-bottom border-secondary ">
-                        <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
-                            <path
-                                d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
-                        </svg>
-                        <span>Заказы</span>
-                    </div>
-                    <div class="aside-item border-bottom border-secondary ">
+                    <a href="{{ route('admin.orders.list') }}">
+                        <div
+                            class="aside-item border-bottom border-secondary @if (str_contains(Route::currentRouteName(), 'orders')) active @endif">
+                            <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
+                                <path
+                                    d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z" />
+                            </svg>
+                            <span>Заказы</span>
+                        </div>
+                    </a>
+                    {{-- <div class="aside-item border-bottom border-secondary ">
                         <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                             fill="currentColor" class="bi bi-wallet2" viewBox="0 0 16 16">
                             <path
                                 d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z" />
                         </svg>
                         <span>Транзакции</span>
-                    </div>
-                    <div class="aside-item border-bottom border-secondary ">
-                        <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
-                            <path
-                                d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
-                        </svg>
-                        <span>Пользователи</span>
+                    </div> --}}
+                    <a href="{{ route('admin.repairs.list') }}">
+                        <div
+                            class="aside-item border-bottom border-secondary @if (str_contains(Route::currentRouteName(), 'repairs')) active @endif">
+                            <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                fill="currentColor" class="bi bi-bug" viewBox="0 0 16 16">
+                                <path
+                                    d="M4.355.522a.5.5 0 0 1 .623.333l.291.956A4.979 4.979 0 0 1 8 1c1.007 0 1.946.298 2.731.811l.29-.956a.5.5 0 1 1 .957.29l-.41 1.352A4.985 4.985 0 0 1 13 6h.5a.5.5 0 0 0 .5-.5V5a.5.5 0 0 1 1 0v.5A1.5 1.5 0 0 1 13.5 7H13v1h1.5a.5.5 0 0 1 0 1H13v1h.5a1.5 1.5 0 0 1 1.5 1.5v.5a.5.5 0 1 1-1 0v-.5a.5.5 0 0 0-.5-.5H13a5 5 0 0 1-10 0h-.5a.5.5 0 0 0-.5.5v.5a.5.5 0 1 1-1 0v-.5A1.5 1.5 0 0 1 2.5 10H3V9H1.5a.5.5 0 0 1 0-1H3V7h-.5A1.5 1.5 0 0 1 1 5.5V5a.5.5 0 0 1 1 0v.5a.5.5 0 0 0 .5.5H3c0-1.364.547-2.601 1.432-3.503l-.41-1.352a.5.5 0 0 1 .333-.623zM4 7v4a4 4 0 0 0 3.5 3.97V7H4zm4.5 0v7.97A4 4 0 0 0 12 11V7H8.5zM12 6a3.989 3.989 0 0 0-1.334-2.982A3.983 3.983 0 0 0 8 2a3.983 3.983 0 0 0-2.667 1.018A3.989 3.989 0 0 0 4 6h8z" />
+                            </svg>
+                            <span>Заявки на ремонт</span>
+                        </div>
+                    </a>
+                    <a href="{{ route('admin.users.list') }}">
+                        <div
+                            class="aside-item border-bottom border-secondary @if (str_contains(Route::currentRouteName(), 'users')) active @endif">
+                            <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                <path
+                                    d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8Zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022ZM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816ZM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0Zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+                            </svg>
+                            <span>Пользователи</span>
+                        </div>
+                    </a>
+                    <div class="mt-auto p-2 text-white text-center d-flex flex-column">
+                        <span>
+                            <span id="hours">{{ Carbon\Carbon::now()->isoFormat('H') }}</span>:<span
+                                id="minutes">{{ Carbon\Carbon::now()->isoFormat('mm') }}</span>
+                        </span>
+                        <span>{{ Carbon\Carbon::now()->isoFormat('D MMMM, YYYY.') }}</span>
+                        <small class="text-secondary mt-3" style="font-size: 10px">HappyWorks © 2023. <br> Все права
+                            защищены.
+                            ИП Егорова Алена Андреевна.</small>
                     </div>
                 </div>
             </aside>

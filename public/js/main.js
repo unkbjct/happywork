@@ -13,13 +13,74 @@ $(document).ready(() => {
         $(".background").removeClass("active")
     })
 
-    $(".nav-children-content").on("mouseenter", function(e){
+    $(".nav-children-content").on("mouseenter", function (e) {
         $(".children-list").removeClass("active")
         $(e.target).next().addClass("active")
     })
 
-    $(".nav-children-content").on("mouseleave", function(e){
+    $(".nav-children-content").on("mouseleave", function (e) {
         $(".children-list").removeClass("active")
+    })
+
+    $(".btn-count-minus").click(function () {
+        if ((Number)($(this).next().val()) <= 1) return;
+        $(this).next().val((Number)($(this).next().val()) - 1)
+    })
+
+    $(".btn-count-plus").click(function () {
+        $(this).prev().val((Number)($(this).prev().val()) + 1)
+    })
+
+    $("input.count-product").on("input", function () {
+        $(this).val($(this).val().replace(/[A-Za-zА-Яа-яЁё]/, ''))
+        // if (this.value <= 0) this.value = 1;
+    })
+
+    $("input.count-product").on("blur", function () {
+        if (!this.value) this.value = 1;
+    })
+
+    $("button.add-to-cart").click(function () {
+        $.ajax({
+            url: `${window.location.protocol}//${window.location.host}/api/catalog/cart/add`,
+            method: 'post',
+            data: {
+                product: this.dataset.productId,
+                count: $(this).prev().find("input").val(),
+            },
+            success: (e) => {
+                showAlert([e.message], 'alert-success')
+                const cartModal = new bootstrap.Modal(document.getElementById('cart-modal'))
+                $("#cart-modal-text").text(`Товар «${e.data.product.title}» успешно добавлен в вашу корзину`)
+                $("#cart-modal-image").attr("src", e.data.image)
+                cartModal.show();
+                $("#cart-badge").text((Number)($("#cart-badge").text()) + (Number)($(this).prev().find("input").val()))
+                $("#cart-badge").removeClass("visually-hidden")
+            },
+            error: (e) => {
+                console.log(e)
+            }
+        })
+    })
+
+    $(".btn-favorite").click(function () {
+        $.ajax({
+            url: `${window.location.protocol}//${window.location.host}/api/catalog/favorite`,
+            method: 'post',
+            data: {
+                product: this.dataset.productId,
+            },
+            success: (e) => {
+                $("#favorites-badge").text(e.data.count);
+                showAlert([e.message], 'alert-success');
+                (e.data.count == 0) ? $("#favorites-badge").addClass("visually-hidden") : $("#favorites-badge").removeClass("visually-hidden");
+                $(this).toggleClass("active");
+            },
+            error: (e) => {
+                console.log(e)
+                showAlert(e.responseJSON.data.errors, 'alert-danger')
+            }
+        })
     })
 
 })

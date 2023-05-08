@@ -21,4 +21,5 @@
 
 .categories-tree .active {
     color: var(--bs-warning);
+    font-weight: 600;
 }

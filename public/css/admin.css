@@ -12,8 +12,8 @@ main {
 .aside-content {
     position: sticky;
     top: 0;
-    display: block !important;
-    height: calc(100vh - 6rem);
+    /* display: block !important; */
+    height: calc(100vh - 3rem);
     /* padding-left: 0.25rem; */
     /* margin-left: -0.25rem; */
     overflow-y: auto;

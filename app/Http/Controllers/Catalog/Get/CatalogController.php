@@ -41,7 +41,23 @@ class CatalogController extends Controller
 
 
         if ($request->has('q') && $request->q) {
+            $words = explode(" ", $request->q);
+            $products = Product::where("visibility", 1);
+            foreach ($words as $word) {
+                $products->where("title", "LIKE", "%{$word}%");
+            }
+            $products = $products->get();
 
+            if ($products->count() === 1) {
+                return redirect()->route("catalog.product", ['title_eng' => $products[0]->title_eng]);
+            }
+
+            return view('catalog', [
+                'parentCategories' => new Collection(),
+                'treeCategories' => $treeCategories,
+                'products' => $products,
+                'watched' => $watched,
+            ]);
         }
 
         if (!$titleEng) {

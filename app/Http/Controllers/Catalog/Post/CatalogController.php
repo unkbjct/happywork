@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Catalog\Post;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Order_product;
 use App\Models\Product;
 use App\Models\Review;
+use Faker\Extension\Extension;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 
 class CatalogController extends Controller
@@ -58,5 +62,176 @@ class CatalogController extends Controller
             'message' => $watched,
             'data' => []
         ], 200)->withCookie(cookie()->forever('watched', json_encode($watched)));
+    }
+
+    public function favorite(Request $request)
+    {
+        if (!Auth::check()) {
+            return response([
+                'ok' => false,
+                'data' => [
+                    'errors' => [
+                        'auth' => 'Вы должны быть авторизованы, чтобы добавить товар в избранное',
+                    ]
+                ]
+            ], 403);
+        }
+        $favorites = json_decode(Cookie::get("favorites", '[]'));
+        if (in_array($request->product, $favorites)) {
+            array_splice($favorites, array_search($request->product, $favorites), 1);
+            $message = "Товар удален из избранного";
+            $remove = true;
+        } else {
+            array_push($favorites, $request->product);
+            $message = "Товар добавлен в избранное";
+            $remove = false;
+        }
+
+        return response([
+            'ok' => true,
+            'message' => $message,
+            'data' => [
+                'remove' => $remove,
+                'count' => sizeof($favorites)
+            ]
+        ], 200)->withCookie(cookie()->forever('favorites', json_encode($favorites)));
+    }
+
+    public function cartAdd(Request $request)
+    {
+        // Cookie::queue(Cookie::forget('cartCount'));
+        // Cookie::queue(Cookie::forget('cart'));
+        // return;
+        $cart = json_decode(Cookie::get("cart", '[]'));
+        $find = false;
+        for ($i = 0; $i < sizeof($cart); $i++) {
+            if ($cart[$i]->id == $request->product) {
+                $find = true;
+                break;
+            }
+        }
+
+        if ($find) {
+            $cart[$i]->count = $cart[$i]->count + $request->count;
+        } else {
+            array_push($cart, [
+                'id' => $request->product,
+                'count' => $request->count,
+            ]);
+        }
+
+        $cartCount = Cookie::get('cartCount', 0);
+        $cartCount += $request->count;
+
+        $product = Product::find($request->product);
+
+        return response([
+            'ok' => true,
+            'message' => "Товар успешно добавлен в козрину",
+            'data' => [
+                'product' => $product,
+                'image' => asset($product->image),
+            ]
+        ], 200)->withCookie(cookie()->forever('cart', json_encode($cart)))->withCookie(cookie()->forever('cartCount', json_encode($cartCount)));
+    }
+
+    public function cartEdit(Request $request)
+    {
+        // Cookie::queue(Cookie::forget('cartCount'));
+        // Cookie::queue(Cookie::forget('cart'));
+        // return;
+        $cart = json_decode(Cookie::get("cart", '[]'));
+        $cartCount = Cookie::get('cartCount', 0);
+
+        foreach ($cart as $cartItem) {
+            if ($cartItem->id == $request->product) {
+                $cartCount -= $cartItem->count;
+                $cartItem->count = $request->count;
+                $cartCount += $cartItem->count;
+            };
+        }
+        return response([
+            'ok' => true,
+            'message' => "Корзина была изменена",
+            'data' => []
+        ], 200)->withCookie(cookie()->forever('cart', json_encode($cart)))->withCookie(cookie()->forever('cartCount', json_encode($cartCount)));
+    }
+
+    public function cartRemove(Request $request)
+    {
+        $cart = json_decode(Cookie::get("cart", '[]'));
+        $cartCount = Cookie::get('cartCount', 0);
+
+
+        if (sizeof($cart) === 1) {
+            Cookie::queue(Cookie::forget('cartCount'));
+            Cookie::queue(Cookie::forget('cart'));
+        } else {
+            for ($i = 0; $i < sizeof($cart); $i++) {
+                if ($cart[$i]->id == $request->product) {
+                    $cartCount -= $cart[$i]->count;
+                    break;
+                };
+            }
+            array_splice($cart, $i, 1);
+        }
+
+        return response([
+            'ok' => true,
+            'message' => "Товар удален из корзины",
+            'data' => []
+        ], 200)->withCookie(cookie()->forever('cart', json_encode($cart)))->withCookie(cookie()->forever('cartCount', json_encode($cartCount)));
+    }
+
+    public function order(Request $request)
+    {
+
+        $validation = $request->validate([
+            'name' => 'required|max:222',
+            'phone' => 'required|max:222',
+        ], [], [
+            'name' => 'Имя',
+            'phone' => 'Телефон',
+        ]);
+
+        $order = new Order();
+        $order->name = $request->name;
+        $order->phone = $request->phone;
+        $order->email = $request->email;
+        $order->city = $request->city;
+        $order->street = $request->street;
+        $order->house = $request->house;
+        $order->apart = $request->apart;
+        $order->comment = $request->comment;
+        $order->delivery = $request->delivery;
+        $order->amount = $request->amount;
+        $order->delivery_price = $request->delivery_price;
+        $order->user = $request->user;
+        $order->save();
+
+        $cart = json_decode(Cookie::get("cart", '[]'));
+
+        foreach ($cart as $cartItem) {
+            $tmpProduct = Product::find($cartItem->id);
+            $orderProduct = new Order_product();
+            $orderProduct->order_id = $order->id;
+            $orderProduct->product = $tmpProduct->id;
+            $orderProduct->count = $cartItem->count;
+            $orderProduct->price = ($tmpProduct->sale) ? $tmpProduct->sale : $tmpProduct->price;
+            $orderProduct->save();
+        }
+
+        Cookie::queue(Cookie::forget('cart'));
+        Cookie::queue(Cookie::forget('cartCount'));
+
+
+
+        return response([
+            'ok' => true,
+            'message' => "Заказ успешно создан",
+            'data' => [
+                'url' => route('user.history'),
+            ]
+        ], 200);
     }
 }

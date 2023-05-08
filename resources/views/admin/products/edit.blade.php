@@ -337,7 +337,8 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <button class="btn btn-warning mb-2">Посмотреть товар на сайте</button>
+                            <a href="{{ route('catalog.product', ['title_eng' => $product->title_eng]) }}" target="_blank"
+                                class="btn btn-warning mb-2">Посмотреть товар на сайте</a>
                             <button class="btn btn-danger mb-2" data-bs-toggle="modal"
                                 data-bs-target="#modal-confirm">Удалть товар</button>
                         </div>

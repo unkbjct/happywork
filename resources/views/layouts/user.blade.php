@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('public/css/catalog.css') }}">
+@endsection
+
 @section('main')
     <div class="container">
         <section class="mb-2">
@@ -36,12 +40,19 @@
                                         заказов</a>
                                 </li>
                                 <li class="nav-item ">
-                                    <a class="nav-link ps-2 py-1 text-dark">Сравнение</a>
-                                </li>
-                                <li class="nav-item ">
                                     <a class="nav-link ps-2 py-1 text-dark" href="{{ route('user.logout') }}">Выход</a>
                                 </li>
                             </ul>
+                            <div class="pt-4 px-2 mb-4">
+                                <a class="text-dark text-decoration-none" href="{{ route('catalog') }}">
+                                    <h5>Каталог</h5>
+                                </a>
+                                <div class="categories-tree">
+                                    @foreach ($treeCategories as $treeItem)
+                                        @include('components.catalogCategoryTree')
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
