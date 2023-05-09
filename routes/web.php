@@ -112,5 +112,13 @@ Route::group(['prefix' => 'api'], function () {
         Route::post('/cart/edit', [CatalogCore::class, 'cartEdit'])->name('api.catalog.cart.edit');
         Route::post('/cart/remove', [CatalogCore::class, 'cartRemove'])->name('api.catalog.cart.remove');
         Route::post('/order/create', [CatalogCore::class, 'order'])->name('api.catalog.order.create');
+
+
+        Route::post('/product/{product}', [CatalogCore::class, 'product']);
+        Route::post('/productsin/', [CatalogCore::class, 'productsIn']);
+        Route::match(['get', 'post'], '/{title_eng?}', [CatalogCore::class, 'catalog']);
     });
+
+    Route::post('/user/history', [CatalogCore::class, 'history']);
+    Route::post('/order/info', [CatalogCore::class, 'orderInfo']);
 });

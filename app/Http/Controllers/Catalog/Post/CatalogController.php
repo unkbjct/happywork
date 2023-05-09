@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Catalog\Post;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Order;
 use App\Models\Order_product;
 use App\Models\Product;
+use App\Models\Product_attribute;
 use App\Models\Review;
+use App\Models\User;
 use Faker\Extension\Extension;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -233,5 +237,207 @@ class CatalogController extends Controller
                 'url' => route('user.history'),
             ]
         ], 200);
+    }
+
+    public function catalog(Request $request, $titleEng = null)
+    {
+
+        $treeCategories = Category::all();
+        $treeCategories->transform(function ($category) {
+            $category = $this->buildChildTree($category);
+            return $category;
+        });
+        $treeCategories = $treeCategories->reject(function ($item) {
+            return $item->parent_id !== null;
+        });
+
+        if ($request->has('q') && $request->q) {
+            $words = explode(" ", $request->q);
+            $products = Product::where("visibility", 1);
+            foreach ($words as $word) {
+                $products->where("title", "LIKE", "%{$word}%");
+            }
+            $products = $products->get();
+
+            if ($products->count() === 1) {
+                return redirect()->route("catalog.product", ['title_eng' => $products[0]->title_eng]);
+            }
+
+            return response([
+                'ok' => true,
+                'message' => null,
+                'data' => [
+                    'categories' => new Collection(),
+                    'parentCategories' => new Collection(),
+                    'treeCategories' => $treeCategories,
+                    'products' => $products,
+                ]
+            ], 200);
+        }
+
+
+        if (!$titleEng) {
+            return response([
+                'ok' => true,
+                'message' => null,
+                'data' => [
+                    'parentCategories' => new Collection(),
+                    'categories' => Category::whereNull("depth")->get(),
+                    'treeCategories' => $treeCategories,
+                    'products' => new Collection(),
+                ]
+            ], 200);
+        }
+
+        $category = Category::where("title_eng", $titleEng)->first();
+
+        if (!$category) return abort(404);
+
+        $products = Product::select();
+
+        $category->nextLevel = Category::where("parent_id", $category->id)->get();
+        $category->childList = new Collection();
+        $category->childList->push($category);
+        $category = $this->buildChildList($category, $category);
+
+
+        $tmpCategoriesList = [];
+        foreach ($category->childList as $child) {
+            array_push($tmpCategoriesList, $child->id);
+        }
+        $category->childList = new Collection();
+
+        $products->whereIn("products.category", $tmpCategoriesList);
+        $products = $products->where("visibility", 1)->get();
+
+        $parentCategories = new Collection();
+        $tmpCategory = $category;
+        while (true) {
+            $parentCategories->push($tmpCategory);
+            if (!$tmpCategory->parent_id) break;
+            $tmpCategory = Category::find($tmpCategory->parent_id);
+        }
+        $parentCategories = $parentCategories->sortBy("depth");
+
+
+        // dd($category);
+
+        return response([
+            'ok' => true,
+            'message' => null,
+            'data' => [
+                'parentCategories' => $parentCategories,
+                'category' => $category,
+                'products' => $products,
+                'treeCategories' => $treeCategories,
+            ]
+        ], 200);
+    }
+
+    public function product(Product $product)
+    {
+        $parentCategories = new Collection();
+        $tmpCategory = Category::find($product->category);
+        while (true) {
+            $parentCategories->push($tmpCategory);
+            if (!$tmpCategory->parent_id) break;
+            $tmpCategory = Category::find($tmpCategory->parent_id);
+        }
+        $parentCategories = $parentCategories->sortBy("depth");
+
+        $attributes = Product_attribute::where("product", $product->id)->get();
+
+        $reviews = Review::where("product", $product->id)->get();
+
+        $watched = new Collection();
+        if (Cookie::get("watched")) {
+            $tmpBy3 = [];
+            for ($i = 0; $i < sizeof(json_decode(Cookie::get("watched"))); $i++) {
+                array_push($tmpBy3, Product::find(array_reverse(json_decode(Cookie::get("watched")))[$i]));
+                if (($i + 1) % 3 === 0 || sizeof(json_decode(Cookie::get("watched"))) === $i + 1) {
+                    $watched->push($tmpBy3);
+                    $tmpBy3 = [];
+                }
+            }
+        }
+
+        return response([
+            'ok' => true,
+            'message' => null,
+            'data' => [
+                'product' => $product,
+                'parentCategories' => $parentCategories,
+                'attributes' => $attributes,
+                'reviews' => $reviews,
+            ]
+        ], 200);
+    }
+
+
+    public function productsIn(Request $request)
+    {
+        $products = Product::whereIn("id", $request->products)->orderByDesc("id")->get();
+        return response([
+            'ok' => true,
+            'message' => null,
+            'data' => [
+                'products' => $products,
+            ]
+        ], 200);
+    }
+
+    public function history(Request $request)
+    {
+        $user = User::where("api_token", $request->apiToken)->first();
+
+        $orders = Order::where("user", $user->id)->orWhere("phone", $user->phone)->orderByDesc("id")->get();
+        return response([
+            'ok' => true,
+            'message' => null,
+            'data' => [
+                'orders' => $orders,
+            ]
+        ], 200);
+    }
+
+    public function orderInfo(Request $request)
+    {
+        $order = Order::find($request->order);
+
+        $orderProducts = Order_product::where("order_id", $order->id)
+            ->join("products", "order_products.product", "=", "products.id")
+            ->select("products.title", "products.id", "order_products.count", "order_products.price")
+            ->get();
+
+        return response([
+            'ok' => true,
+            'message' => null,
+            'data' => [
+                'order' => $order,
+                'orderProducts' => $orderProducts,
+            ]
+        ], 200);
+    }
+
+
+    function buildChildList($category, $item)
+    {
+        $children = Category::where("parent_id", "=", $item->id)->get();
+        foreach ($children as $child) {
+            $category->childList->push($child);
+            $this->buildChildList($category, $child);
+        }
+        return $category;
+    }
+
+    function buildChildTree($item)
+    {
+        $children = Category::where("parent_id", $item->id)->get();
+        $children->transform(function ($child) {
+            $this->buildChildTree($child);
+            return $child;
+        });
+        $item->children = $children;
+        return $item;
     }
 }

@@ -88,7 +88,7 @@ class CatalogController extends Controller
         $products->whereIn("products.category", $tmpCategoriesList);
 
 
-        $products = $products->get();
+        $products = $products->where("visibility", 1)->get();
         // dd($products);
 
         $parentCategories = new Collection();

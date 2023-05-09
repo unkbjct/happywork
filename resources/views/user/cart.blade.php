@@ -349,12 +349,13 @@
                         </div>
                         <div class="col-lg-4"></div>
                         <div class="col-lg-4">
-                            <div class="text-center mt-auto py-4"
-                                @if (Auth::check()) data-user="{{ Auth::user()->id }}" @endif>
+                            <div class="text-center mt-auto py-4">
                                 <p>* Обязательные поля</p>
                                 <p>Нажимая на кнопку Оформить заказ, Вы соглашаетесь с <a href="">правилами
                                         обработки данных</a></p>
-                                <button class="btn btn-dark" id="create-order">Оформить заказ</button>
+                                <button class="btn btn-dark" id="create-order"
+                                    @if (Auth::check()) data-user="{{ Auth::user()->id }}" @endif>Оформить
+                                    заказ</button>
                             </div>
                         </div>
                         <div class="col-lg-4"></div>
