@@ -259,10 +259,6 @@ class CatalogController extends Controller
             }
             $products = $products->get();
 
-            if ($products->count() === 1) {
-                return redirect()->route("catalog.product", ['title_eng' => $products[0]->title_eng]);
-            }
-
             return response([
                 'ok' => true,
                 'message' => null,
