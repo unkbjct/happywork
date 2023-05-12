@@ -247,6 +247,7 @@ class CatalogController extends Controller
             'message' => "Заказ успешно создан",
             'data' => [
                 'url' => route('user.history'),
+                'order' => $order,
             ]
         ], 200);
     }
