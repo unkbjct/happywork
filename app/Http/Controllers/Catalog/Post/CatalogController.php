@@ -187,6 +187,18 @@ class CatalogController extends Controller
         ], 200)->withCookie(cookie()->forever('cart', json_encode($cart)))->withCookie(cookie()->forever('cartCount', json_encode($cartCount)));
     }
 
+    public function cartClear()
+    {
+        Cookie::queue(Cookie::forget('cart'));
+        Cookie::queue(Cookie::forget('cartCount'));
+
+        return response([
+            'ok' => true,
+            'message' => "Корзина пуста",
+            'data' => []
+        ], 200);
+    }
+
     public function order(Request $request)
     {
 

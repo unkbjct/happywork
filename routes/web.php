@@ -111,6 +111,7 @@ Route::group(['prefix' => 'api'], function () {
         Route::post('/cart/add', [CatalogCore::class, 'cartAdd'])->name('api.catalog.cart.add');
         Route::post('/cart/edit', [CatalogCore::class, 'cartEdit'])->name('api.catalog.cart.edit');
         Route::post('/cart/remove', [CatalogCore::class, 'cartRemove'])->name('api.catalog.cart.remove');
+        Route::post('/cart/clear', [CatalogCore::class, 'cartClear'])->name('api.catalog.cart.clear');
         Route::post('/order/create', [CatalogCore::class, 'order'])->name('api.catalog.order.create');
 
 
