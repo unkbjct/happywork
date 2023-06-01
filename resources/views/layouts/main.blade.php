@@ -607,7 +607,7 @@
                     </div>
 
                     <div class="d-flex flex-column flex-sm-row justify-content-between pt-4 mt-4 border-top">
-                        <small class="text-muted">HappyWorks © 2023. Все права защищены. ИП Егорова Алена Андреевна.</small>
+                        <small class="text-muted">HappyWorks © 2023. Все права защищены. ИП Егорова Алена Викторовна.</small>
                         <ul class="list-unstyled d-flex">
                             <li class="ms-3"><a class="link-body-emphasis" href="#"><svg class="bi"
                                         width="24" height="24">

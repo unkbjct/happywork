@@ -135,7 +135,7 @@
                         <span>{{ Carbon\Carbon::now()->isoFormat('D MMMM, YYYY.') }}</span>
                         <small class="text-secondary mt-3" style="font-size: 10px">HappyWorks © 2023. <br> Все права
                             защищены.
-                            ИП Егорова Алена Андреевна.</small>
+                            ИП Егорова Алена Викторовна.</small>
                     </div>
                 </div>
             </aside>

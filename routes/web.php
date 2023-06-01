@@ -16,6 +16,7 @@ use App\Http\Controllers\Single\Get\SingleController as SingleViews;
 use App\Http\Controllers\Single\Post\SingleController as SingleCore;
 use App\Http\Controllers\User\Get\UserController as UserViews;
 use App\Http\Controllers\User\Post\UserController as UserCore;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,7 +31,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $hits = Product::where("visibility", 1)->where("status", "hit")->limit(10)->get();
+    $new = Product::where("visibility", 1)->where("status", "new")->limit(20)->get();
+    $popular = Product::where("visibility", 1)->inRandomOrder()->limit(20)->get();
+    return view('welcome', [
+        'hits' => $hits,
+        'new' => $new,
+        'popular' => $popular,
+    ]);
 })->name('home');
 
 Route::get('/about', [SingleViews::class, 'about'])->name('about');

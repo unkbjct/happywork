@@ -259,11 +259,10 @@
                                                     </a>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <span class="fa fa-star text-body-tertiary"></span>
-                                                    <span class="fa fa-star text-body-tertiary"></span>
-                                                    <span class="fa fa-star text-body-tertiary"></span>
-                                                    <span class="fa fa-star text-body-tertiary"></span>
-                                                    <span class="fa fa-star text-body-tertiary"></span>
+                                                    @for ($i = 0; $i < 5; $i++)
+                                                        <span
+                                                            class="fa fa-star @if ($product->rating > $i) text-warning @else text-body-tertiary @endif"></span>
+                                                    @endfor
                                                 </div>
                                                 @if ($product->sale)
                                                     <div class="mb-3 d-flex align-items-center">
