@@ -128,7 +128,7 @@
                                 <input type="text" class="form-control" id="mobile">
                             </div>
                             <div class="mb-3">
-                                <label for="mobile" class="form-label">Модель телефона</label>
+                                <label for="mobile" class="form-label">Ваш номер телефона</label>
                                 <textarea id="description" rows="4" class="form-control"></textarea>
                             </div>
                             <div class="d-flex">
